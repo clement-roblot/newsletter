@@ -20,6 +20,15 @@ from secrets import *
 # # articles from the most popular articles in hacker news and other websites like that
 
 
+class DisplayImage():
+    title = ""
+    url = ""
+
+    def __init__(self, title, url):
+        self.title = title
+        self.url = url
+
+
 def getRandomQuote(path):
 
     selectedQuoteNumber = 0
@@ -47,8 +56,20 @@ def getRandomXkcd():
     randomComic["title"] = randomComicObj.getAsciiTitle().decode('ascii')
     randomComic["imgUrl"] = randomComicObj.getAsciiImageLink().decode('ascii')
 
-    return randomComic
+    imageTitle = "<a href=\"https://xkcd.com/\">XKCD : " + randomComic["title"] + "</a>"
 
+    imageObj = DisplayImage(imageTitle, randomComic["imgUrl"])
+
+    return imageObj
+
+
+def getRandomImage():
+
+    imageTitle = "<a href=\"https://unsplash.com\">Unsplash</a>"
+
+    imageObj = DisplayImage(imageTitle, "https://source.unsplash.com/daily?landscape")
+
+    return imageObj
 
 
 def sendEmail(htmlVersion, txtVersion=""):
@@ -105,13 +126,19 @@ if __name__ == "__main__":
 
     if (needToSendEmail() == True) or (args.test == True):
         dailyQuote = getRandomQuote("./quotes.csv")
-        dailyXKCD = getRandomXkcd()
+        # dailyImage = getRandomXkcd()
+        dailyImage = getRandomImage()
+
+        # https://loremflickr.com/500/500/landscape
+        # https://source.unsplash.com/daily?travel
+        # https://source.unsplash.com/daily?landscape
+
 
         mailTemplate = Template(filename="./mailTemplate.html")
         mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
                                            dailyQuoteAuthor=dailyQuote[1],
-                                           imageUrl=dailyXKCD["imgUrl"],
-                                           imageTitle=dailyXKCD["title"])
+                                           imageUrl=dailyImage.url,
+                                           imageTitle=dailyImage.title)
         
         # print(mailInstance)
 
