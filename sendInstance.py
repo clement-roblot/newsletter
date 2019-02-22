@@ -40,7 +40,14 @@ def getRandomQuote(path):
 
 def getRandomXkcd():
 
-    randomComic = xkcd.getRandomComic()
+    randomComic = {}
+
+    randomComicObj = xkcd.getRandomComic()
+
+    randomComic["title"] = randomComicObj.getAsciiTitle().decode('ascii')
+    randomComic["imgUrl"] = randomComicObj.getAsciiImageLink().decode('ascii')
+
+    return randomComic
 
 
 
@@ -98,10 +105,13 @@ if __name__ == "__main__":
 
     if (needToSendEmail() == True) or (args.test == True):
         dailyQuote = getRandomQuote("./quotes.csv")
+        dailyXKCD = getRandomXkcd()
 
         mailTemplate = Template(filename="./mailTemplate.html")
         mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
-                                           dailyQuoteAuthor=dailyQuote[1])
+                                           dailyQuoteAuthor=dailyQuote[1],
+                                           imageUrl=dailyXKCD["imgUrl"],
+                                           imageTitle=dailyXKCD["title"])
         
         # print(mailInstance)
 
