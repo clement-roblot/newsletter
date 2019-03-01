@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+from __future__ import absolute_import
+from __future__ import division, print_function, unicode_literals
+
 import csv
 import random
 import xkcd
@@ -7,6 +10,7 @@ import webbrowser
 import os
 import datetime
 import argparse
+import requests
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -14,19 +18,59 @@ from mako.template import Template
 from secrets import *
 
 
+from sumy.parsers.html import HtmlParser
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer as Summarizer
+from sumy.nlp.stemmers import Stemmer
+from sumy.utils import get_stop_words
+
 # Header like grit or the husle etc..
 # A random picture from IG
 # A quote from the list
 # # articles from the most popular articles in hacker news and other websites like that
+# Have some music in the newsletter like gary playlist
 
 
-class DisplayImage():
-    title = ""
-    url = ""
+
+class Image():
+    title = None
+    url = None
 
     def __init__(self, title, url):
         self.title = title
         self.url = url
+
+
+class Article():
+    title = None
+    summary = None
+    url = None
+    image = None
+
+    language = "english"
+    sentencesCount = 3
+
+    def __init__(self, url):
+        self.url = url
+        self.getSummary()
+
+        print(self.summary)
+
+    def getSummary(self):
+
+        # https://github.com/miso-belica/sumy
+        
+        parser = HtmlParser.from_url(self.url, Tokenizer(self.language))
+        stemmer = Stemmer(self.language)
+
+        summarizer = Summarizer(stemmer)
+        summarizer.stop_words = get_stop_words(self.language)
+
+        # print("Article : " + str(self.url))
+        self.summary = ""
+        for sentence in summarizer(parser.document, self.sentencesCount):
+            self.summary = self.summary + str(sentence)
 
 
 def getRandomQuote(path):
@@ -47,6 +91,7 @@ def getRandomQuote(path):
         selectedQuote = next(quoteReader)
         return selectedQuote
 
+
 def getRandomXkcd():
 
     randomComic = {}
@@ -58,7 +103,7 @@ def getRandomXkcd():
 
     imageTitle = "<a href=\"https://xkcd.com/\">XKCD : " + randomComic["title"] + "</a>"
 
-    imageObj = DisplayImage(imageTitle, randomComic["imgUrl"])
+    imageObj = Image(imageTitle, randomComic["imgUrl"])
 
     return imageObj
 
@@ -67,9 +112,29 @@ def getRandomImage():
 
     imageTitle = "<a href=\"https://unsplash.com\">Unsplash</a>"
 
-    imageObj = DisplayImage(imageTitle, "https://source.unsplash.com/daily?landscape")
+    imageObj = Image(imageTitle, "https://source.unsplash.com/daily?landscape")
 
     return imageObj
+
+
+def getHNStories(count):
+
+    # https://hacker-news.firebaseio.com/v0/topstories.json
+
+    newsList = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    newsList = newsList.json()
+    newsList = newsList[:count]
+
+    articles = []
+    for news in newsList:
+
+        newsObj = requests.get("https://hacker-news.firebaseio.com/v0/item/" + str(news) + ".json")
+        newsObj = newsObj.json()
+
+        article = Article(newsObj["url"])
+        articles.append(article)
+
+    return articles
 
 
 def sendEmail(htmlVersion, txtVersion=""):
@@ -94,6 +159,7 @@ def sendEmail(htmlVersion, txtVersion=""):
         server.sendmail(
             sender_email, receiver_email, message.as_string()
         )
+
 
 def needToSendEmail():
 
@@ -128,6 +194,7 @@ if __name__ == "__main__":
         dailyQuote = getRandomQuote("./quotes.csv")
         # dailyImage = getRandomXkcd()
         dailyImage = getRandomImage()
+        articles = getHNStories(3)
 
         # https://loremflickr.com/500/500/landscape
         # https://source.unsplash.com/daily?travel
@@ -148,4 +215,4 @@ if __name__ == "__main__":
             with open("testEmail.html", "w") as testEmailFile:        
                 testEmailFile.write(str(mailInstance))
             filename = 'file:///'+os.getcwd()+'/' + 'testEmail.html'
-            webbrowser.open_new_tab(filename)
+            #webbrowser.open_new_tab(filename)

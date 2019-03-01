@@ -8,6 +8,11 @@ verify_ssl = true
 [packages]
 mako = "*"
 xkcd = "*"
+requests = "*"
+sumy = "*"
+numpy = "*"
+install = "*"
+extraction = "*"
 
 [requires]
 python_version = "3.6"
