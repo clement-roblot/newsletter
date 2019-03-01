@@ -11,6 +11,7 @@ import os
 import datetime
 import argparse
 import requests
+import extraction
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -54,8 +55,14 @@ class Article():
     def __init__(self, url):
         self.url = url
         self.getSummary()
+        self.getMetadata()
 
-        print(self.summary)
+    def getMetadata(self):
+        html = requests.get(self.url).text
+        extracted = extraction.Extractor().extract(html, source_url=self.url)
+
+        self.title = extracted.title
+        self.image = Image(self.title, extracted.image)
 
     def getSummary(self):
 
@@ -67,7 +74,6 @@ class Article():
         summarizer = Summarizer(stemmer)
         summarizer.stop_words = get_stop_words(self.language)
 
-        # print("Article : " + str(self.url))
         self.summary = ""
         for sentence in summarizer(parser.document, self.sentencesCount):
             self.summary = self.summary + str(sentence)
@@ -207,7 +213,7 @@ if __name__ == "__main__":
                                            imageUrl=dailyImage.url,
                                            imageTitle=dailyImage.title)
         
-        # print(mailInstance)
+        print(mailInstance)
 
         if args.test == False:
             sendEmail(mailInstance)
