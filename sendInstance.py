@@ -50,12 +50,24 @@ class Article():
     image = None
 
     language = "english"
-    sentencesCount = 3
+    sentencesCount = 1
 
     def __init__(self, url):
         self.url = url
         self.getSummary()
         self.getMetadata()
+
+    def isValid(self):
+
+        # If we fail to get the image
+        if not self.image:
+            return False
+
+        # If we catch a capcha
+        if "are you a robot" in self.title.lower():
+            return False
+
+        return True
 
     def getMetadata(self):
         html = requests.get(self.url).text
@@ -129,7 +141,6 @@ def getHNStories(count):
 
     newsList = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json")
     newsList = newsList.json()
-    newsList = newsList[:count]
 
     articles = []
     for news in newsList:
@@ -138,7 +149,13 @@ def getHNStories(count):
         newsObj = newsObj.json()
 
         article = Article(newsObj["url"])
-        articles.append(article)
+
+        # If the article was properly fetched with it's image
+        if article.isValid():
+            articles.append(article)
+
+        if len(articles) == count:
+            break
 
     return articles
 
@@ -210,11 +227,9 @@ if __name__ == "__main__":
         mailTemplate = Template(filename="./mailTemplate.html")
         mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
                                            dailyQuoteAuthor=dailyQuote[1],
-                                           imageUrl=dailyImage.url,
-                                           imageTitle=dailyImage.title)
+                                           articles=articles,
+                                           closingImage=dailyImage)
         
-        print(mailInstance)
-
         if args.test == False:
             sendEmail(mailInstance)
         else:

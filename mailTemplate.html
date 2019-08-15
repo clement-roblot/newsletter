@@ -30,9 +30,20 @@
           </div>
         </div>
 
+        % for article in articles:
+        <div class="row mt-4">
+          <a class="" href="${article.url}">
+            <div style="text-align: center;"><img src="${article.image.url}" style="max-width: 100%; max-height: 100%;"></div>
+            <h3>${article.title}</h3>
+            <p>${article.summary}</p>
+          </a>
+        </div>
+        % endfor
+
+
         <div class="text-center mt-5">
-          <img src="${imageUrl}" style="max-width: 100%; max-height: 100%;">
-          <p>${imageTitle}</p>
+          <img src="${closingImage.url}" style="max-width: 100%; max-height: 100%;">
+          <p>${closingImage.title}</p>
         </div>
 
       </div>
