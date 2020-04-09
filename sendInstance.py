@@ -13,6 +13,7 @@ import argparse
 import requests
 import extraction
 import smtplib, ssl
+import urllib.parse
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
@@ -54,6 +55,7 @@ class Article():
 
     def __init__(self, url):
         self.url = url
+        self.pocketUrl = "https://getpocket.com/edit?url=" + urllib.parse.quote_plus(self.url)
         self.getSummary()
         self.getMetadata()
 
