@@ -32,18 +32,37 @@
 
         % for article in articles:
         <div class="row mt-4">
-          <div style="margin: auto;">
-            <a class="" href="${article.url}">
-              <div style="text-align: center;"><img src="${article.image.url}" style="max-width: 100%; max-height: 100%;"></div>
-            </a>
+
+          <div class="row" style="width: 100%;">
+            <div class="col col-lg-12">
+              <div style="margin: auto;">
+                <a class="" href="${article.url}">
+                  <div style="text-align: center;"><img src="${article.image.url}" style="max-width: 100%; max-height: 100%;"></div>
+                </a>
+              </div>
+            </div>
           </div>
-          <a class="" href="${article.url}">
-            <h3>${article.title}</h3>
-          </a>
-          <p style="text-align: justify; text-justify: inter-word;">${article.summary}</p>
-          <a class="" style="text-align: right;" href="${article.pocketUrl}">
-            <img src="https://assets.getpocket.com/web/main/Components/Logo/pocket_logo@1x.ea8b8e2aef88a30784fc9ccbebe445ab.png">
-          </a>
+
+
+
+          <div class="row" style="width: 100%;">
+            <div class="col col-lg-12">
+              <a class="" href="${article.url}">
+                <h3>${article.title}</h3>
+              </a>
+              <p style="text-align: justify; text-justify: inter-word;">${article.summary}</p>
+            </div>
+          </div>
+
+
+
+          <div class="row justify-content-end" style="width: 100%;">
+            <div class="col col-lg-4">
+              <a class="" style="text-align: right;" href="${article.pocketUrl}">
+                <img src="https://the-tech-spyglass.s3-ap-southeast-1.amazonaws.com/pocket.png" style="height:50px;">
+              </a>
+            </div>
+          </div>
         </div>
         % endfor
 
