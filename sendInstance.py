@@ -61,7 +61,7 @@ class Article():
 
     def isValid(self):
 
-        # If we fail to get the image
+        # If we fail to get the image        
         if not self.image:
             return False
 
@@ -76,7 +76,9 @@ class Article():
         extracted = extraction.Extractor().extract(html, source_url=self.url)
 
         self.title = extracted.title
-        self.image = Image(self.title, extracted.image)
+
+        if extracted.image:
+            self.image = Image(self.title, extracted.image)
 
     def getSummary(self):
 
