@@ -132,9 +132,17 @@ def getRandomXkcd():
 
 def getRandomImage():
 
+    retryCount = 3
+
     imageTitle = "<a href=\"https://unsplash.com\">Unsplash</a>"
 
-    imageObj = Image(imageTitle, "https://source.unsplash.com/daily?landscape")
+    # Try to get an image a maximum of times
+    for i in range(retryCount):
+        imageObj = Image(imageTitle, "https://source.unsplash.com/daily?landscape")
+
+        # If the image is all right we return it
+        if imageObj:
+            return imageObj
 
     return imageObj
 
