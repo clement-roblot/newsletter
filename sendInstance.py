@@ -19,7 +19,6 @@ from email.mime.multipart import MIMEMultipart
 from mako.template import Template
 from secrets import *
 
-
 from sumy.parsers.html import HtmlParser
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
@@ -32,7 +31,6 @@ from sumy.utils import get_stop_words
 # A quote from the list
 # # articles from the most popular articles in hacker news and other websites like that
 # Have some music in the newsletter like gary playlist
-
 
 
 class Image():
@@ -61,7 +59,7 @@ class Article():
 
     def isValid(self):
 
-        # If we fail to get the image        
+        # If we fail to get the image
         if not self.image:
             return False
 
@@ -83,7 +81,7 @@ class Article():
     def getSummary(self):
 
         # https://github.com/miso-belica/sumy
-        
+
         parser = HtmlParser.from_url(self.url, Tokenizer(self.language))
         stemmer = Stemmer(self.language)
 
@@ -212,17 +210,18 @@ def needToSendEmail():
         pass
 
     # Write date in file
-    with open("lastSent", "w") as lastSentFile:        
+    with open("lastSent", "w") as lastSentFile:
         lastSentFile.write(str(now.date()))
 
     return True
+
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--test', dest='test', action='store_const',
-                       const=True, default=False,
-                       help='Generate a test email and display it in a browser')
+                        const=True, default=False,
+                        help='Generate a test email and display it in a browser')
     args = parser.parse_args()
 
     if (needToSendEmail() == True) or (args.test == True):
@@ -235,17 +234,16 @@ if __name__ == "__main__":
         # https://source.unsplash.com/daily?travel
         # https://source.unsplash.com/daily?landscape
 
-
         mailTemplate = Template(filename="./mailTemplate.html")
         mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
                                            dailyQuoteAuthor=dailyQuote[1],
                                            articles=articles,
                                            closingImage=dailyImage)
-        
+
         if args.test == False:
             sendEmail(mailInstance)
         else:
-            with open("testEmail.html", "w") as testEmailFile:        
+            with open("testEmail.html", "w") as testEmailFile:
                 testEmailFile.write(str(mailInstance))
             filename = 'file:///'+os.getcwd()+'/' + 'testEmail.html'
-            #webbrowser.open_new_tab(filename)
+            # webbrowser.open_new_tab(filename)
