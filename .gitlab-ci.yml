@@ -10,6 +10,7 @@ Deploy:
     - pip install pipenv
     - pipenv install
     - cd `pipenv --venv`/lib/python*/site-packages
+    - apt install zip
     - zip -r $srcDir/deploymentPackage.zip .
     - cd $srcDir
     - zip -gr deploymentPackage.zip *
