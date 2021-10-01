@@ -4,7 +4,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 Deploy:
-  stage: deploy to lambda
+  stage: deploy
   script:
     - srcDir=`pwd`
     - pipenv install
