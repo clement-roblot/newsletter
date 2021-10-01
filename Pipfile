@@ -10,8 +10,9 @@ mako = "*"
 xkcd = "*"
 requests = "*"
 sumy = "*"
-numpy = "*"
 extraction = "*"
+numpy = "*"
+lxml = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"

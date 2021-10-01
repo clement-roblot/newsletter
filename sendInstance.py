@@ -216,8 +216,7 @@ def needToSendEmail():
     return True
 
 
-if __name__ == "__main__":
-
+def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--test', dest='test', action='store_const',
                         const=True, default=False,
@@ -247,3 +246,8 @@ if __name__ == "__main__":
                 testEmailFile.write(str(mailInstance))
             filename = 'file:///'+os.getcwd()+'/' + 'testEmail.html'
             # webbrowser.open_new_tab(filename)
+
+
+
+if __name__ == "__main__":
+    main()
