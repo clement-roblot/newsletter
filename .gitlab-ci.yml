@@ -7,7 +7,7 @@ Deploy:
   stage: deploy
   script:
     - srcDir=`pwd`
-    - pip install --user pipenv
+    - pip install pipenv
     - pipenv install
     - cd `pipenv --venv`/lib/python*/site-packages
     - zip -r $srcDir/deploymentPackage.zip .
