@@ -216,37 +216,42 @@ def needToSendEmail():
     return True
 
 
-def main():
+def sendEmail():
+    dailyQuote = getRandomQuote("./quotes.csv")
+    # dailyImage = getRandomXkcd()
+    dailyImage = getRandomImage()
+    articles = getHNStories(3)
+
+    # https://loremflickr.com/500/500/landscape
+    # https://source.unsplash.com/daily?travel
+    # https://source.unsplash.com/daily?landscape
+
+    mailTemplate = Template(filename="./mailTemplate.html")
+    mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
+                                       dailyQuoteAuthor=dailyQuote[1],
+                                       articles=articles,
+                                       closingImage=dailyImage)
+
+    if args.test == False:
+        sendEmail(mailInstance)
+    else:
+        with open("testEmail.html", "w") as testEmailFile:
+            testEmailFile.write(str(mailInstance))
+        filename = 'file:///'+os.getcwd()+'/' + 'testEmail.html'
+        # webbrowser.open_new_tab(filename)
+
+
+def main(isLambda = False):
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--test', dest='test', action='store_const',
                         const=True, default=False,
                         help='Generate a test email and display it in a browser')
     args = parser.parse_args()
 
-    if (needToSendEmail() == True) or (args.test == True):
-        dailyQuote = getRandomQuote("./quotes.csv")
-        # dailyImage = getRandomXkcd()
-        dailyImage = getRandomImage()
-        articles = getHNStories(3)
-
-        # https://loremflickr.com/500/500/landscape
-        # https://source.unsplash.com/daily?travel
-        # https://source.unsplash.com/daily?landscape
-
-        mailTemplate = Template(filename="./mailTemplate.html")
-        mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
-                                           dailyQuoteAuthor=dailyQuote[1],
-                                           articles=articles,
-                                           closingImage=dailyImage)
-
-        if args.test == False:
-            sendEmail(mailInstance)
-        else:
-            with open("testEmail.html", "w") as testEmailFile:
-                testEmailFile.write(str(mailInstance))
-            filename = 'file:///'+os.getcwd()+'/' + 'testEmail.html'
-            # webbrowser.open_new_tab(filename)
-
+    if isLambda is True:
+        sendEmail()
+    elif (needToSendEmail() == True) or (args.test == True):
+        sendEmail()
 
 
 if __name__ == "__main__":

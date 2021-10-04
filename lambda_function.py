@@ -3,7 +3,7 @@ import sendInstance
 
 def lambda_handler(event, context):
     # TODO implement
-    sendInstance.main()
+    sendInstance.main(True)
     print("Everything OK")
     return {
         'statusCode': 200,
