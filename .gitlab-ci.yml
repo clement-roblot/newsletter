@@ -11,9 +11,8 @@ Deploy:
     - ./aws/install
     - rm -rf aws && rm -f awscliv2.zip
     - srcDir=`pwd`
-    - pip install pipenv nltk
+    - pip install pipenv
     - pipenv install
-    - python -c "import nltk; nltk.download('punkt')"
     - cd `pipenv --venv`/lib/python*/site-packages
     - apt update && apt install zip
     - zip -r $srcDir/deploymentPackage.zip .

@@ -14,6 +14,7 @@ import requests
 import extraction
 import smtplib, ssl
 import urllib.parse
+import nltk
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
@@ -242,6 +243,7 @@ def sendEmail():
 
 
 def main(isLambda = False):
+    nltk.download('punkt')
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--test', dest='test', action='store_const',
                         const=True, default=False,
