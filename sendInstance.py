@@ -217,7 +217,7 @@ def needToSendEmail():
     return True
 
 
-def sendEmail():
+def sendEmail(args):
     dailyQuote = getRandomQuote("./quotes.csv")
     # dailyImage = getRandomXkcd()
     dailyImage = getRandomImage()
@@ -251,9 +251,9 @@ def main(isLambda = False):
     args = parser.parse_args()
 
     if isLambda is True:
-        sendEmail()
+        sendEmail(args)
     elif (needToSendEmail() == True) or (args.test == True):
-        sendEmail()
+        sendEmail(args)
 
 
 if __name__ == "__main__":
