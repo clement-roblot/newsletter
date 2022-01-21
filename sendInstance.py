@@ -98,14 +98,14 @@ def getRandomQuote(path):
 
     selectedQuoteNumber = 0
     with open(path, newline='\n') as csvfile:
-        quoteReader = csv.reader(csvfile, delimiter=',', quotechar='\"')
+        quoteReader = csv.reader(csvfile, delimiter='|', quotechar='\"')
 
         nbrQuotes = sum(1 for quote in quoteReader)
         selectedQuoteNumber = random.randint(1, nbrQuotes)
 
     with open(path, newline='\n') as csvfile:
         # Reload the CSV file
-        quoteReader = csv.reader(csvfile, delimiter=',', quotechar='\"')
+        quoteReader = csv.reader(csvfile, delimiter='|', quotechar='\"')
         for i in range(selectedQuoteNumber-1):
             next(quoteReader)
 
@@ -218,7 +218,7 @@ def needToSendEmail():
 
 
 def processEmail(args):
-    dailyQuote = getRandomQuote("./quotes.csv")
+    dailyQuote = getRandomQuote("/storage/Obsidian/Quotes.md")
     # dailyImage = getRandomXkcd()
     dailyImage = getRandomImage()
     articles = getHNStories(3)
