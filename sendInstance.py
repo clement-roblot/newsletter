@@ -19,6 +19,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
 from secrets import *
+import yagmail
 
 from sumy.parsers.html import HtmlParser
 from sumy.parsers.plaintext import PlaintextParser
@@ -159,6 +160,7 @@ def getHNStories(count):
         newsObj = requests.get("https://hacker-news.firebaseio.com/v0/item/" + str(news) + ".json")
         newsObj = newsObj.json()
 
+        print("Got article")
         article = Article(newsObj["url"])
 
         # If the article was properly fetched with it's image
@@ -171,6 +173,7 @@ def getHNStories(count):
     return articles
 
 
+# Switch to api call to mailgun: https://stackoverflow.com/questions/6270782/how-to-send-an-email-with-python
 def sendEmail(htmlVersion, txtVersion=""):
 
     message = MIMEMultipart("alternative")
@@ -186,13 +189,14 @@ def sendEmail(htmlVersion, txtVersion=""):
         part2 = MIMEText(text, "plain")
         message.attach(part2)
 
-    # Create secure connection with server and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(
-            sender_email, receiver_email, message.as_string()
-        )
+    try:
+        #initializing the server connection
+        yag = yagmail.SMTP(user=sender_email, password=password)
+        #sending the email
+        yag.send(to=receiver_email, subject="The Tech Spyglass", contents=message.as_string())
+        print("Email sent successfully")
+    except Exception as e:
+        print("Error, email was not sent: " + str(e))
 
 
 def needToSendEmail():
@@ -218,10 +222,14 @@ def needToSendEmail():
 
 
 def processEmail(args):
-    dailyQuote = getRandomQuote("/storage/Obsidian/Quotes.md")
+
+    print("Assembling the message")
+    dailyQuote = getRandomQuote("/home/karlito/Brain/Quotes.md")
     # dailyImage = getRandomXkcd()
     dailyImage = getRandomImage()
     articles = getHNStories(3)
+
+    print("Finished the message")
 
     # https://loremflickr.com/500/500/landscape
     # https://source.unsplash.com/daily?travel

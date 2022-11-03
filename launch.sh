@@ -3,4 +3,4 @@
 BASEDIR=$(dirname "$0")
 
 cd $BASEDIR
-/usr/bin/pipenv run ./sendInstance.py
+/usr/local/bin/pipenv run ./sendInstance.py
