@@ -19,7 +19,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
 from secrets import *
-import yagmail
 
 from sumy.parsers.html import HtmlParser
 from sumy.parsers.plaintext import PlaintextParser
@@ -189,14 +188,13 @@ def sendEmail(htmlVersion, txtVersion=""):
         part2 = MIMEText(text, "plain")
         message.attach(part2)
 
-    try:
-        #initializing the server connection
-        yag = yagmail.SMTP(user=sender_email, password=password)
-        #sending the email
-        yag.send(to=receiver_email, subject="The Tech Spyglass", contents=message.as_string())
-        print("Email sent successfully")
-    except Exception as e:
-        print("Error, email was not sent: " + str(e))
+    # Create secure connection with server and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(
+            sender_email, receiver_email, message.as_string()
+        )
 
 
 def needToSendEmail():

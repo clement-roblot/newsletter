@@ -14,7 +14,6 @@ extraction = "*"
 numpy = "*"
 lxml = "*"
 nltk = "*"
-yagmail = "*"
 
 [requires]
 python_version = "3"
