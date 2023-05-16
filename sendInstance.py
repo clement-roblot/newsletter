@@ -248,7 +248,7 @@ def processEmail(args):
         # webbrowser.open_new_tab(filename)
 
 
-def main(isLambda = False):
+def main():
     nltk.download('punkt')
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--test', dest='test', action='store_const',
@@ -256,10 +256,7 @@ def main(isLambda = False):
                         help='Generate a test email and display it in a browser')
     args = parser.parse_args()
 
-    if isLambda is True:
-        processEmail(args)
-    elif (needToSendEmail() == True) or (args.test == True):
-        processEmail(args)
+    processEmail(args)
 
 
 if __name__ == "__main__":
