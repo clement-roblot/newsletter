@@ -4,7 +4,7 @@ This project will generate your own newsletter and send you one instance of it e
 
 ## Getting Started
 
-You will have to build a secret file containing your email server informations. You have to create and fill out the file "secret.py" like so :
+You will have to build a secret file containing your email server informations. You have to create and fill out the file "mySecrets.py" like so :
 
 ```
 sender_email = "sender@gmail.com"

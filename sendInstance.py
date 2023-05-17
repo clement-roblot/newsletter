@@ -18,8 +18,9 @@ import nltk
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
-from secrets import *
+from mySecrets import *
 
+import numpy
 from sumy.parsers.html import HtmlParser
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
