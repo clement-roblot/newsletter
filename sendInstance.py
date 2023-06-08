@@ -43,6 +43,13 @@ class Image():
         self.title = title
         self.url = url
 
+    def isValidImage(self):
+        image_formats = ("image/png", "image/jpeg", "image/jpg")
+        r = requests.head(self.url, timeout=5)
+        if r.headers["content-type"] in image_formats:
+            return True
+        return False
+
 
 class Article():
     title = None
@@ -56,13 +63,24 @@ class Article():
     def __init__(self, url):
         self.url = url
         self.pocketUrl = "https://getpocket.com/edit?url=" + urllib.parse.quote_plus(self.url)
+        self.htmlContent = requests.get(self.url, timeout=5).text
+        self.initializedProperly = True
+        print("Initing article")
         self.getSummary()
+        print("Got summed article")
         self.getMetadata()
+        print("Got metadata article")
 
     def isValid(self):
 
+        if not self.initializedProperly:
+            return False
+
         # If we fail to get the image
         if not self.image:
+            return False
+
+        if not self.image.isValidImage():
             return False
 
         # If we catch a capcha
@@ -72,27 +90,33 @@ class Article():
         return True
 
     def getMetadata(self):
-        html = requests.get(self.url).text
-        extracted = extraction.Extractor().extract(html, source_url=self.url)
+        try:
+            extracted = extraction.Extractor().extract(self.htmlContent, source_url=self.url)
 
-        self.title = extracted.title
+            self.title = extracted.title
 
-        if extracted.image:
-            self.image = Image(self.title, extracted.image)
+            if extracted.image:
+                self.image = Image(self.title, extracted.image)
+        except:
+            self.initializedProperly = False
 
     def getSummary(self):
 
-        # https://github.com/miso-belica/sumy
+        try:
+            # https://github.com/miso-belica/sumy
+            parser = HtmlParser.from_string(self.htmlContent, self.url, Tokenizer(self.language))
+            stemmer = Stemmer(self.language)
 
-        parser = HtmlParser.from_url(self.url, Tokenizer(self.language))
-        stemmer = Stemmer(self.language)
+            summarizer = Summarizer(stemmer)
+            summarizer.stop_words = get_stop_words(self.language)
 
-        summarizer = Summarizer(stemmer)
-        summarizer.stop_words = get_stop_words(self.language)
-
-        self.summary = ""
-        for sentence in summarizer(parser.document, self.sentencesCount):
-            self.summary = self.summary + str(sentence)
+            self.summary = ""
+            for sentence in summarizer(parser.document, self.sentencesCount):
+                self.summary = self.summary + str(sentence)
+        except Exception as e:
+            print("Error summurizing:")
+            print(e)
+            self.initializedProperly = False
 
 
 def getRandomQuote(path):
@@ -157,7 +181,7 @@ def getHNStories(count):
     articles = []
     for news in newsList:
 
-        newsObj = requests.get("https://hacker-news.firebaseio.com/v0/item/" + str(news) + ".json")
+        newsObj = requests.get("https://hacker-news.firebaseio.com/v0/item/" + str(news) + ".json", timeout=5)
         newsObj = newsObj.json()
 
         print("Got article")
