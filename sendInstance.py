@@ -166,8 +166,10 @@ def getRandomImage():
 
         # If the image is all right we return it
         if imageObj:
-            return imageObj
+            if imageObj.isValidImage():
+                return imageObj
 
+    # TODO: When we faile 3 times we should display a fixed image we control in the S3 buket
     return imageObj
 
 
