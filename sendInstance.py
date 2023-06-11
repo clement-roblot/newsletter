@@ -69,8 +69,12 @@ class Article():
     def __init__(self, url):
         self.url = url
         self.pocketUrl = "https://getpocket.com/edit?url=" + urllib.parse.quote_plus(self.url)
-        self.htmlContent = requests.get(self.url, timeout=5).text
-        self.initializedProperly = True
+
+        try:
+            self.htmlContent = requests.get(self.url, timeout=5).text
+        except requests.exceptions.ConnectTimeout:
+            self.htmlContent = None
+
         print("Initing article")
         self.getSummary()
         print("Got summed article")
@@ -79,7 +83,7 @@ class Article():
 
     def isValid(self):
 
-        if not self.initializedProperly:
+        if self.htmlContent is None:
             return False
 
         # If we fail to get the image
