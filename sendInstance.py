@@ -44,10 +44,16 @@ class Image():
         self.url = url
 
     def isValidImage(self):
-        image_formats = ("image/png", "image/jpeg", "image/jpg")
-        r = requests.head(self.url, timeout=5)
-        if r.headers["content-type"] in image_formats:
-            return True
+
+        try:
+            image_formats = ("image/png", "image/jpeg", "image/jpg")
+            r = requests.head(self.url, timeout=5)
+            if r.headers["content-type"] in image_formats:
+                return True
+        except requests.exceptions.ConnectionError:
+            # Our request got rejected
+            return False
+    
         return False
 
 
