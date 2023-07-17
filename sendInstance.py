@@ -53,7 +53,10 @@ class Image():
         except requests.exceptions.ConnectionError:
             # Our request got rejected
             return False
-    
+        except KeyError:
+            # The response doesn't have "content-type"
+            return False
+
         return False
 
 
@@ -136,7 +139,7 @@ def getRandomQuote(path):
         quoteReader = csv.reader(csvfile, delimiter='|', quotechar='\"')
 
         nbrQuotes = sum(1 for quote in quoteReader)
-        selectedQuoteNumber = random.randint(1, nbrQuotes)
+        selectedQuoteNumber = random.randint(2, nbrQuotes)
 
     with open(path, newline='\n') as csvfile:
         # Reload the CSV file
@@ -197,6 +200,9 @@ def getHNStories(count):
         newsObj = newsObj.json()
 
         print("Got article")
+        if "url" not in newsObj:
+            continue
+
         article = Article(newsObj["url"])
 
         # If the article was properly fetched with it's image
