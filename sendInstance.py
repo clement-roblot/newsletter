@@ -53,10 +53,13 @@ class Image():
         except requests.exceptions.ConnectionError:
             # Our request got rejected
             return False
+        except requests.exceptions.InvalidSchema:
+            # Our request got rejected
+            return False
         except KeyError:
             # The response doesn't have "content-type"
             return False
-
+        
         return False
 
 
@@ -76,6 +79,8 @@ class Article():
         try:
             self.htmlContent = requests.get(self.url, timeout=5).text
         except requests.exceptions.ConnectTimeout:
+            self.htmlContent = None
+        except requests.exceptions.ReadTimeout:
             self.htmlContent = None
 
         print("Initing article")
