@@ -225,8 +225,8 @@ def sendEmail(htmlVersion, txtVersion=""):
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "The Tech Spyglass"
-    message["From"] = sender_email
-    message["To"] = receiver_email
+    message["From"] = os.getenv("NEWSLETTER_SENDER")
+    message["To"] = os.getenv("NEWSLETTER_RECEIVER")
 
     # Turn these into plain/html MIMEText objects
     part1 = MIMEText(htmlVersion, "html")
@@ -239,9 +239,9 @@ def sendEmail(htmlVersion, txtVersion=""):
     # Create secure connection with server and send email
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(sender_email, password)
+        server.login(os.getenv("NEWSLETTER_SENDER"), os.getenv("NEWSLETTER_PASSWORD"))
         server.sendmail(
-            sender_email, receiver_email, message.as_string()
+            os.getenv("NEWSLETTER_SENDER"), os.getenv("NEWSLETTER_RECEIVER"), message.as_string()
         )
 
 
