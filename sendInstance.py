@@ -18,7 +18,6 @@ import nltk
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
-from mySecrets import *
 
 import numpy
 from sumy.parsers.html import HtmlParser
