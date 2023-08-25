@@ -269,7 +269,7 @@ def needToSendEmail():
 def processEmail(args):
 
     print("Assembling the message")
-    dailyQuote = getRandomQuote("/home/karlito/Brain/Quotes.md")
+    dailyQuote = getRandomQuote("/brain/Quotes.md")
     # dailyImage = getRandomXkcd()
     dailyImage = getRandomImage()
     articles = getHNStories(3)
