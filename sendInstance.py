@@ -14,6 +14,7 @@ import requests
 import extraction
 import smtplib, ssl
 import urllib.parse
+from random import randrange
 import nltk
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -138,21 +139,29 @@ class Article():
 
 def getRandomQuote(path):
 
-    selectedQuoteNumber = 0
-    with open(path, newline='\n') as csvfile:
-        quoteReader = csv.reader(csvfile, delimiter='|', quotechar='\"')
+    baseAddress = "https://directus.martobre.fr"
 
-        nbrQuotes = sum(1 for quote in quoteReader)
-        selectedQuoteNumber = random.randint(2, nbrQuotes)
+    # Login
+    payload = {"email": "clement.roblot@martobre.fr", "password": os.getenv("DIRECTUS_PASSWORD")}
+    r = requests.post(baseAddress+"/auth/login", json=payload)
 
-    with open(path, newline='\n') as csvfile:
-        # Reload the CSV file
-        quoteReader = csv.reader(csvfile, delimiter='|', quotechar='\"')
-        for i in range(selectedQuoteNumber-1):
-            next(quoteReader)
+    token = r.json()["data"]["access_token"]
+    refreshToken = r.json()["data"]["refresh_token"]
 
-        selectedQuote = next(quoteReader)
-        return selectedQuote
+    # Get quotes count
+    headers = {"Authorization": f"Bearer {token}"}
+    r = requests.get(baseAddress+"/items/Quotes?aggregate[count]=*", headers=headers)
+    quotesCount = r.json()["data"][0]["count"]
+
+    randomIndex = randrange(quotesCount)
+
+    headers = {"Authorization": f"Bearer {token}"}
+    r = requests.get(baseAddress+f"/items/Quotes?limit=1&offset={randomIndex}", headers=headers)
+
+    quote = r.json()["data"][0]["Quote"]
+    author = r.json()["data"][0]["Author"]
+
+    return [quote, author]
 
 
 def getRandomXkcd():
@@ -269,7 +278,7 @@ def needToSendEmail():
 def processEmail(args):
 
     print("Assembling the message")
-    dailyQuote = getRandomQuote("/brain/Quotes.md")
+    dailyQuote = getRandomQuote()
     # dailyImage = getRandomXkcd()
     dailyImage = getRandomImage()
     articles = getHNStories(3)
