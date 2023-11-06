@@ -137,7 +137,7 @@ class Article():
             self.initializedProperly = False
 
 
-def getRandomQuote(path):
+def getRandomQuote():
 
     baseAddress = "https://directus.martobre.fr"
 
