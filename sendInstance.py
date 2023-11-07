@@ -290,8 +290,8 @@ def processEmail(args):
     # https://source.unsplash.com/daily?landscape
 
     mailTemplate = Template(filename="./mailTemplate.html")
-    mailInstance = mailTemplate.render(dailyQuote=dailyQuote[1],
-                                       dailyQuoteAuthor=dailyQuote[2],
+    mailInstance = mailTemplate.render(dailyQuote=dailyQuote[0],
+                                       dailyQuoteAuthor=dailyQuote[1],
                                        articles=articles,
                                        closingImage=dailyImage)
 
