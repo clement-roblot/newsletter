@@ -3,10 +3,7 @@
 from __future__ import absolute_import
 from __future__ import division, print_function, unicode_literals
 
-import csv
-import random
 import xkcd
-import webbrowser
 import os
 import datetime
 import argparse
@@ -15,25 +12,14 @@ import extraction
 import smtplib, ssl
 import urllib.parse
 from random import randrange
-import nltk
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mako.template import Template
+from openai import OpenAI
 
-import numpy
-from sumy.parsers.html import HtmlParser
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer as Summarizer
-from sumy.nlp.stemmers import Stemmer
-from sumy.utils import get_stop_words
-
-# Header like grit or the husle etc..
-# A random picture from IG
-# A quote from the list
-# # articles from the most popular articles in hacker news and other websites like that
-# Have some music in the newsletter like gary playlist
-
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
 
 class Image():
     title = None
@@ -121,16 +107,19 @@ class Article():
     def getSummary(self):
 
         try:
-            # https://github.com/miso-belica/sumy
-            parser = HtmlParser.from_string(self.htmlContent, self.url, Tokenizer(self.language))
-            stemmer = Stemmer(self.language)
+            prompt = f"Please summarize the following article in one paragraph as a teaser for it. Do not start with \"in this article\":\n\n{self.url}"
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt, 
+                    }
+                ],
+                model="gpt-3.5-turbo",
+            )
 
-            summarizer = Summarizer(stemmer)
-            summarizer.stop_words = get_stop_words(self.language)
-
-            self.summary = ""
-            for sentence in summarizer(parser.document, self.sentencesCount):
-                self.summary = self.summary + str(sentence)
+            self.summary = chat_completion.choices[0].message.content
+            return self.summary
         except Exception as e:
             print("Error summurizing:")
             print(e)
@@ -143,23 +132,28 @@ def getRandomQuote():
 
     # Login
     payload = {"email": "clement.roblot@martobre.fr", "password": os.getenv("DIRECTUS_PASSWORD")}
-    r = requests.post(baseAddress+"/auth/login", json=payload)
 
-    token = r.json()["data"]["access_token"]
-    refreshToken = r.json()["data"]["refresh_token"]
+    try:
+        r = requests.post(baseAddress+"/auth/login", json=payload)
 
-    # Get quotes count
-    headers = {"Authorization": f"Bearer {token}"}
-    r = requests.get(baseAddress+"/items/Quotes?aggregate[count]=*", headers=headers)
-    quotesCount = r.json()["data"][0]["count"]
+        token = r.json()["data"]["access_token"]
+        # refreshToken = r.json()["data"]["refresh_token"]
 
-    randomIndex = randrange(quotesCount)
+        # Get quotes count
+        headers = {"Authorization": f"Bearer {token}"}
+        r = requests.get(baseAddress+"/items/Quotes?aggregate[count]=*", headers=headers)
+        quotesCount = r.json()["data"][0]["count"]
 
-    headers = {"Authorization": f"Bearer {token}"}
-    r = requests.get(baseAddress+f"/items/Quotes?limit=1&offset={randomIndex}", headers=headers)
+        randomIndex = randrange(quotesCount)
 
-    quote = r.json()["data"][0]["Quote"]
-    author = r.json()["data"][0]["Author"]
+        headers = {"Authorization": f"Bearer {token}"}
+        r = requests.get(baseAddress+f"/items/Quotes?limit=1&offset={randomIndex}", headers=headers)
+
+        quote = r.json()["data"][0]["Quote"]
+        author = r.json()["data"][0]["Author"]
+    except:
+        quote = "The best way to predict the future is to invent it."
+        author = "Alan Kay"
 
     return [quote, author]
 
@@ -301,11 +295,9 @@ def processEmail(args):
         with open("testEmail.html", "w") as testEmailFile:
             testEmailFile.write(str(mailInstance))
         filename = 'file:///'+os.getcwd()+'/' + 'testEmail.html'
-        # webbrowser.open_new_tab(filename)
 
 
 def main():
-    nltk.download('punkt')
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--test', dest='test', action='store_const',
                         const=True, default=False,
