@@ -240,7 +240,7 @@ def sendEmail(htmlVersion, txtVersion=""):
 
     # Create secure connection with server and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+    with smtplib.SMTP_SSL("smtppro.zoho.com", 465, context=context) as server:
         server.login(os.getenv("NEWSLETTER_SENDER"), os.getenv("NEWSLETTER_PASSWORD"))
         server.sendmail(
             os.getenv("NEWSLETTER_SENDER"), os.getenv("NEWSLETTER_RECEIVER"), message.as_string()
