@@ -42,6 +42,9 @@ class Image():
         except requests.exceptions.InvalidSchema:
             # Our request got rejected
             return False
+        except requests.exceptions.ReadTimeout:
+            # Our request got rejected
+            return False
         except KeyError:
             # The response doesn't have "content-type"
             return False
@@ -175,22 +178,30 @@ def getRandomXkcd():
 
 
 def getRandomImage():
+    url = "https://api.unsplash.com/photos/random"
+    params = {
+        'query': 'landscape',
+        'orientation': 'landscape',
+        'client_id': os.environ.get("UNSPLASH_API_KEY"),
+    }
+    
+    try:
+        response = requests.get(url, params=params)
+        
+        if response.status_code == 200:
+            data = response.json()
+            image_url = data['urls']['full']
 
-    retryCount = 3
+            imageTitle = "<a href=\"https://unsplash.com\">Unsplash</a>"
+            imageObj = Image(imageTitle, image_url)
 
-    imageTitle = "<a href=\"https://unsplash.com\">Unsplash</a>"
-
-    # Try to get an image a maximum of times
-    for i in range(retryCount):
-        imageObj = Image(imageTitle, "https://source.unsplash.com/daily?landscape")
-
-        # If the image is all right we return it
-        if imageObj:
-            if imageObj.isValidImage():
-                return imageObj
-
-    # TODO: When we faile 3 times we should display a fixed image we control in the S3 buket
-    return imageObj
+            if imageObj:
+                if imageObj.isValidImage():
+                    return imageObj
+    except:
+        pass
+            
+    return None
 
 
 def getHNStories(count):
